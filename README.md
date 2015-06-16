@@ -3,6 +3,8 @@
 A clojure jdbc library that doesn't get in your way, and that defaults to using connection pooling.
 
 
+[![Clojars Project](http://clojars.org/sjdbc/latest-version.svg)](http://clojars.org/sjdbc)
+
 ## Usage
 
 ### Connect

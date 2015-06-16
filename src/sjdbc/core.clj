@@ -41,9 +41,12 @@
   ([conn sql & params]
     (jdbc/execute! conn (cons sql params))))
 
-(defn- get-pooled-connection [^String jdbc-url ^String user ^String pwd {:keys [min-pool-size max-pool-size] :or {min-pool-size 1 max-pool-size 10}}]
+(defn- get-pooled-connection [^String jdbc-url ^String user ^String pwd {:keys [partition-size min-pool-size max-pool-size] :or {partition-size 2 min-pool-size 1 max-pool-size 10}}]
   (doto
     (BoneCPDataSource.)
     (.setJdbcUrl jdbc-url)
     (.setUser user)
-    (.setPassword pwd)))
+    (.setPassword pwd)
+    (.setPartitionCount (int partition-size))
+    (.setMaxConnectionsPerPartition (int max-pool-size))
+    (.setMinConnectionsPerPartition (int min-pool-size))))
