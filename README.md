@@ -32,6 +32,12 @@ A clojure jdbc library that doesn't get in your way, and that defaults to using 
 DB access should always be performed using db pooling, this is way sjdbc has it backed in as standard and 
 will always use a pooled connection.
 
+Settings are:
+
+```clojure
+{:keys [partition-size min-pool-size max-pool-size] 
+:or {partition-size 2 min-pool-size 1 max-pool-size 10}}
+```
 
 ## License
 
