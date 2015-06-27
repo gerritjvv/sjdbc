@@ -20,4 +20,10 @@
                                                                                    (.setFetchSize rs (int 10))
                                                                                    (while (.next rs)
                                                                                      (swap! counter inc))))
-                               (is (= @counter 1)))))
+                               (is (= @counter 1)))
+                             (let [counter (atom 0)]
+                                  (sjdbc/query-streaming-rs conn "SELECT * FROM test"
+                                                            (fn [^ResultSet rs]
+                                                              (while (.next rs)
+                                                                (swap! counter inc))))
+                                  (is (= @counter 1)))))

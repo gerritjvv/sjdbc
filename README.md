@@ -33,12 +33,20 @@ A clojure jdbc library that doesn't get in your way, and that defaults to using 
 ;for complete control use with result set
 
 (sjdbc/query-with-rs conn "SELECT * FROM test" (fn [^ResultSet rs]
-                                                                                   (.setFetchSize rs (int 10))
-                                                                                   (while (.next rs)
-                                                                                     (swap! counter inc))))
-
+                                                    (while (.next rs)
+                                                      (swap! counter inc))))
 ```
 
+### Streaming large Mysql data sets 
+
+See: http://dev.mysql.com/doc/connector-j/en/connector-j-reference-implementation-notes.html (under ResultSet)
+
+```clojure
+(sjdbc/query-streaming-rs conn "SELECT * FROM test" (fn [^ResultSet rs]
+                                                     (while (.next rs)
+                                                       (swap! counter inc))))
+
+```
 
 ### Connection Pooling
 

@@ -2,7 +2,8 @@
   (:require [clojure.java.jdbc :as jdbc])
   (:import (javax.sql DataSource)
            (com.jolbox.bonecp BoneCPDataSource)
-           (java.io Closeable)))
+           (java.io Closeable)
+           (java.sql Connection ResultSet Statement)))
 
 ;;use a Closeable defrecord to allow for usage with-open and other types of resource closing functions
 (defrecord Conn [^DataSource datasource]
@@ -40,6 +41,17 @@
   [conn sql f]
   (jdbc/db-query-with-resultset conn [sql] f))
 
+
+(defn query-streaming-rs
+  "Used for mysql when the data set expected is huge, by default mysql will load all the resultsets into memory first
+   then respond, but on large datasets this is not efficient, see http://dev.mysql.com/doc/connector-j/en/connector-j-reference-implementation-notes.html.
+   This implementation will call the function f with the ResultSet, each record needs to be read with the shortest delay possible"
+  [{:keys [^DataSource datasource]} sql f]
+  (with-open [^Connection conn (.getConnection datasource)]
+    (with-open [^Statement stmt (.createStatement conn ResultSet/TYPE_FORWARD_ONLY ResultSet/CONCUR_READ_ONLY)]
+      (.setFetchSize stmt Integer/MIN_VALUE)
+      (with-open [^ResultSet rs (.executeQuery stmt sql)]
+        (f rs)))))
 
 (defn
   exec
