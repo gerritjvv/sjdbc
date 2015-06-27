@@ -18,7 +18,10 @@ A clojure jdbc library that doesn't get in your way, and that defaults to using 
   
 ;; or with authentication
 (def conn (sjdbc/open "jdbc url" "user" "password" pool-options))
-(jsdbc/query conn "select * from testtable")
+(sjdbc/exec conn "CREATE TABLE testtable (id int, name varchar)")
+
+(sjdbc/query conn "select * from testtable")
+
 
 ;;close the connection pool when no more queries are going to be made
 (jsdbc/close conn)

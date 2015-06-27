@@ -9,6 +9,7 @@
 
             :resource-paths ["lib/RedshiftJDBC41-1.1.2.0002.jar"]
             :dependencies [
+			   [org.clojure/core.typed "0.3.0-alpha5"]
                            [com.jolbox/bonecp "0.8.0.RELEASE"]
                            [org.clojure/java.jdbc "0.3.6"]
                            [hsqldb/hsqldb "1.8.0.10" :scope "test"]
