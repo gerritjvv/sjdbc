@@ -1,6 +1,7 @@
 (ns sjdbc.core-test
   (:require [clojure.test :refer :all]
-            [sjdbc.core :as sjdbc]))
+            [sjdbc.core :as sjdbc])
+  (:import (java.sql ResultSet)))
 
 
 ;; load the db driver
@@ -13,4 +14,10 @@
                              (sjdbc/exec conn "INSERT INTO test (id, name) VALUES(?, ?)" 1 "abc")
                              (is (count (sjdbc/query conn "SELECT * FROM test")) 1)
                              (is (:name (first (sjdbc/query conn "SELECT * FROM test"))) "abc")
-                             (is (:id (first (sjdbc/query conn "SELECT * FROM test"))) 1)))
+                             (is (:id (first (sjdbc/query conn "SELECT * FROM test"))) 1)
+                             (let [counter (atom 0)]
+                               (sjdbc/query-with-rs conn "SELECT * FROM test" (fn [^ResultSet rs]
+                                                                                   (.setFetchSize rs (int 10))
+                                                                                   (while (.next rs)
+                                                                                     (swap! counter inc))))
+                               (is (= @counter 1)))))

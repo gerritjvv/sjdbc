@@ -29,6 +29,16 @@ A clojure jdbc library that doesn't get in your way, and that defaults to using 
 
 ```
 
+```clojure
+;for complete control use with result set
+
+(sjdbc/query-with-rs conn "SELECT * FROM test" (fn [^ResultSet rs]
+                                                                                   (.setFetchSize rs (int 10))
+                                                                                   (while (.next rs)
+                                                                                     (swap! counter inc))))
+
+```
+
 
 ### Connection Pooling
 

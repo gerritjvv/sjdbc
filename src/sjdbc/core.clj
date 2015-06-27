@@ -25,11 +25,20 @@
 
 (defn
   query
-  "Return a sequence with each item as a map and the keys are equal to the column names"
+  "Return a sequence with each item as a map and the keys are equal to the column names
+   If "
   ([conn sql]
     (query conn sql identity))
   ([conn sql row-f]
-    (jdbc/query conn [sql] :row-fn row-f)))
+    (jdbc/query conn [sql] :row-fn row-f))
+  ([conn sql row-f {:keys [fetch-size] :or {fetch-size 100000}}]
+   (with-open [stmt (jdbc/prepare-statement conn sql :fetch-size fetch-size)]
+     (jdbc/query conn [stmt] :row-fn row-f))))
+
+(defn query-with-rs
+  "Use for large queries, calls the function f with (f rs:ResultSet)"
+  [conn sql f]
+  (jdbc/db-query-with-resultset conn [sql] f))
 
 
 (defn
