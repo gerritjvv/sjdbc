@@ -1,7 +1,7 @@
 (ns sjdbc.core
   (:require [clojure.java.jdbc :as jdbc])
   (:import (javax.sql DataSource)
-           (com.jolbox.bonecp BoneCPDataSource)
+           (com.jolbox.bonecp BoneCPDataSource BoneCPConfig)
            (java.io Closeable)
            (java.sql Connection ResultSet Statement)))
 
@@ -72,7 +72,10 @@
 
 (defn- get-pooled-connection [^String jdbc-url ^String user ^String pwd {:keys [partition-size min-pool-size max-pool-size] :or {partition-size 2 min-pool-size 1 max-pool-size 10}}]
   (doto
-    (BoneCPDataSource.)
+    ;; we disable connection tracking as a workaround based on https://bugs.launchpad.net/bonecp/+bug/1243551
+    (BoneCPDataSource. (doto
+                         (BoneCPConfig.)
+                         (.setDisableConnectionTracking true)))
     (.setJdbcUrl jdbc-url)
     (.setUser user)
     (.setPassword pwd)
