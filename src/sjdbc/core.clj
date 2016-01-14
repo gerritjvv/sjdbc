@@ -62,6 +62,14 @@
   ([conn sql & params]
     (jdbc/execute! conn (cons sql params))))
 
+(defn no-transaction
+  "same as exec but with :transaction? set to false"
+  ([conn sql]
+   (jdbc/execute! conn sql [] :transaction? false))
+  ([conn sql & params]
+   (jdbc/execute! conn (cons sql params) :transaction? false)))
+
+
 (defn- get-pooled-connection [^String jdbc-url ^String user ^String pwd {:keys [partition-size min-pool-size max-pool-size] :or {partition-size 2 min-pool-size 1 max-pool-size 10}}]
   (doto
     (BoneCPDataSource.)
