@@ -1,4 +1,4 @@
-(defproject sjdbc "0.1.4"
+(defproject sjdbc "0.1.5"
             :description "Very simple JDBC library allows you to write simple SQL as is and send to jdbc, all connections are pooled by default."
             :url "https://github.com/gerritjvv/sjdbc"
             :license {:name "Eclipse Public License"

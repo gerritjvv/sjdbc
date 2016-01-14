@@ -65,7 +65,7 @@
 (defn no-transaction
   "same as exec but with :transaction? set to false"
   ([conn sql]
-   (jdbc/execute! conn sql [] :transaction? false))
+   (jdbc/execute! conn [sql] :transaction? false))
   ([conn sql & params]
    (jdbc/execute! conn (cons sql params) :transaction? false)))
 
