@@ -1,6 +1,6 @@
-(defproject sjdbc "0.1.2"
-            :description "FIXME: write description"
-            :url "http://example.com/FIXME"
+(defproject sjdbc "0.1.3"
+            :description "Very simple JDBC library allows you to write simple SQL as is and send to jdbc, all connections are pooled by default."
+            :url "https://github.com/gerritjvv/sjdbc"
             :license {:name "Eclipse Public License"
                       :url  "http://www.eclipse.org/legal/epl-v10.html"}
             :javac-options ["-target" "1.7" "-source" "1.7" "-Xlint:-options"]
