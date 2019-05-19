@@ -13,7 +13,8 @@ A clojure jdbc library that doesn't get in your way, and that defaults to using 
 
 (require '[sjdbc.core :as sjdbc])
 
-(def conn (sjdbc/open "jdbc url" pool-options))
+;;(def conn (sjdbc/open "jdbc url" pool-options))
+(def conn (sjdbc/open "jdbc:postgresql://localhost/test?user=fred&password=secret&ssl=true" {:min-pool-size 1 :max-pool-size 10}))
 (jsdbc/query conn "select * from testtable")
   
 ;; or with authentication
