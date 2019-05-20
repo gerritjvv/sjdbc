@@ -3,7 +3,26 @@
   (:import (javax.sql DataSource)
            (com.jolbox.bonecp BoneCPDataSource BoneCPConfig)
            (java.io Closeable)
-           (java.sql Connection ResultSet Statement)))
+           (java.sql Connection ResultSet Statement)
+           (org.apache.commons.lang3 StringUtils)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; utils
+
+(defn multiple-params? [^String sql]
+  (= 2
+     (count (take 2 (filter #(= % \?)
+                            sql)))))
+
+
+(defn query-type
+  "return :named-query if the : is int the query for :name, :name2"
+  [^String sql]
+  (cond
+    (.contains sql "?") :param-query
+    (.contains sql ":") :named-query
+    :else :param-query))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;use a Closeable defrecord to allow for usage with-open and other types of resource closing functions
 (defrecord Conn [^DataSource datasource]
@@ -31,10 +50,10 @@
   ([conn sql]
     (query conn sql identity))
   ([conn sql row-f]
-    (jdbc/query conn [sql] :row-fn row-f))
+    (jdbc/query conn [sql] {:row-fn row-f}))
   ([conn sql row-f {:keys [fetch-size] :or {fetch-size 100000}}]
-   (with-open [stmt (jdbc/prepare-statement conn sql :fetch-size fetch-size)]
-     (jdbc/query conn [stmt] :row-fn row-f))))
+   (with-open [stmt (jdbc/prepare-statement conn sql {:fetch-size fetch-size})]
+     (jdbc/query conn [stmt] {:row-fn row-f}))))
 
 (defn query-with-rs
   "Use for large queries, calls the function f with (f rs:ResultSet)"
@@ -60,14 +79,26 @@
   ([conn sql]
     (jdbc/execute! conn [sql]))
   ([conn sql & params]
-    (jdbc/execute! conn (cons sql params))))
+
+   (cond
+
+     ;; this is the catch the frequent use case where we call (exec conn (map f (range 0 n)))
+     ;; without it the map result is passed as a the first parameter
+     (and (multiple-params? sql)
+          (second params))   (jdbc/execute! conn (cons sql (flatten params)))
+
+     :else
+     (jdbc/execute! conn (cons sql params)))))
+
 
 (defn no-transaction
   "same as exec but with :transaction? set to false"
   ([conn sql]
-   (jdbc/execute! conn [sql] :transaction? false))
+   (jdbc/execute! conn [sql] {:transaction? false}))
   ([conn sql & params]
-   (jdbc/execute! conn (cons sql params) :transaction? false)))
+   (jdbc/execute! conn (cons sql params) {:transaction? false})
+
+    ))
 
 
 (defn- get-pooled-connection [^String jdbc-url ^String user ^String pwd {:keys [partition-size min-pool-size max-pool-size] :or {partition-size 2 min-pool-size 1 max-pool-size 10}}]

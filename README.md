@@ -23,6 +23,9 @@ A clojure jdbc library that doesn't get in your way, and that defaults to using 
 (sjdbc/query conn "select * from testtable")
 
 
+;; insert with parameters
+(sjdbc/exec conn "INSERT INTO testtable (?, ?)" 1 "myname")
+
 ;;close the connection pool when no more queries are going to be made
 (jsdbc/close conn)
   
@@ -59,6 +62,10 @@ Settings are:
 {:keys [partition-size min-pool-size max-pool-size] 
 :or {partition-size 2 min-pool-size 1 max-pool-size 10}}
 ```
+
+### Pooling implementation
+
+This library uses [bonecp](https://jolbox.com/).
 
 ## License
 
