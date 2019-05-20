@@ -3,7 +3,7 @@
   (:import (javax.sql DataSource)
            (com.jolbox.bonecp BoneCPDataSource BoneCPConfig)
            (java.io Closeable)
-           (java.sql Connection ResultSet Statement)
+           (java.sql Connection ResultSet Statement SQLException)
            (org.apache.commons.lang3 StringUtils)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -41,7 +41,12 @@
 
 (defn close [{:keys [^DataSource datasource]}]
   {:pre [datasource]}
-  (.close datasource))
+  (try
+    (when (instance? Closeable datasource)
+      (.close ^Closeable datasource))
+    (catch SQLException _
+      ;;ignore to avoid https://bugs.mysql.com/bug.php?id=93590
+      )))
 
 (defn
   query
