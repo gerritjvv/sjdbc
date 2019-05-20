@@ -1,8 +1,7 @@
 (ns sjdbc.core-test
   (:require [clojure.test :refer :all]
             [sjdbc.core :as sjdbc])
-  (:import (java.sql ResultSet)
-           (org.hsqldb jdbcDriver)))
+  (:import (java.sql ResultSet)))
 
 
 ;; load the db driver
